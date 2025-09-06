@@ -3,8 +3,7 @@ name: FastAPI CI/CD
 on:
   push:
     branches:
-      - main
-  pull_request:
+      - main  # Only run workflow when pushing to main
 
 jobs:
   build:
@@ -29,6 +28,7 @@ jobs:
           pip install -r requirements.txt
           # Add pytest if you have tests
           pip install pytest
+
       - name: Run tests
         run: |
           cd app
