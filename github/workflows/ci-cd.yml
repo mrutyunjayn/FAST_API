@@ -45,11 +45,10 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and Push Docker image
-        uses: docker/build-push-action@v4
-        with:
-          context: .              # repo root (includes Dockerfile + app/)
-          file: ./Dockerfile      # Dockerfile at root
-          push: true
-          tags: |
-            mrutyunjayn/cicd:latest
-            mrutyunjayn/cicd:${{ github.sha }}
+        run: |
+          # Build with both tags (latest + commit SHA)
+          docker build -f ./Dockerfile -t mrutyunjayn/cicd:latest -t mrutyunjayn/cicd:${{ github.sha }} .
+
+          # Push both tags
+          docker push mrutyunjayn/cicd:latest
+          docker push mrutyunjayn/cicd:${{ github.sha }}
