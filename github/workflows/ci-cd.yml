@@ -51,5 +51,5 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/fastapi-app:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/fastapi-app:${{ github.sha }}
+            mrutyunjayn/cicd:latest
+            mrutyunjayn/cicd:${{ github.sha }}
