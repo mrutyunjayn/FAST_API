@@ -31,24 +31,28 @@ jobs:
           pytest || echo "No tests yet"
 
   docker:
-    runs-on: ubuntu-latest
-    needs: build
+  runs-on: ubuntu-latest
+  needs: build
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      - name: Log in to DockerHub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+    - name: Log in to DockerHub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and Push Docker image
-        run: |
-          # Build with both tags (latest + commit SHA)
-          docker build -f ./Dockerfile -t mrutyunjayn/cicd:latest -t mrutyunjayn/cicd:${{ github.sha }} .
+    - name: Build and Push Docker image
+      run: |
+        # Use your repo name instead of "my-image-name"
+        IMAGE_NAME=mrutyunjayn/cicd
 
-          # Push both tags
-          docker push mrutyunjayn/cicd:latest
-          docker push mrutyunjayn/cicd:${{ github.sha }}
+        # Build with 2 tags (latest + commit SHA)
+        docker build -f ./Dockerfile -t $IMAGE_NAME:latest -t $IMAGE_NAME:${{ github.sha }} .
+
+        # Push both tags
+        docker push $IMAGE_NAME:latest
+        docker push $IMAGE_NAME:${{ github.sha }}
+
