@@ -3,32 +3,28 @@ name: FastAPI CI/CD
 on:
   push:
     branches:
-      - main
-  pull_request:
+      - main   # Run only on pushes to main branch
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout repo
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Setup Python for tests
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.10"
 
-      # Install dependencies and run tests
       - name: Install dependencies
         run: |
           cd app
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          # Add pytest if you have tests
           pip install pytest
+
       - name: Run tests
         run: |
           cd app
@@ -36,24 +32,24 @@ jobs:
 
   docker:
     runs-on: ubuntu-latest
-    needs: build
+    needs: build   # Run after build job succeeds
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Login to DockerHub
       - name: Log in to DockerHub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # Build and push Docker image
       - name: Build and Push Docker image
         uses: docker/build-push-action@v4
         with:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/fastapi-app:latest
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/fastapi-app:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/fastapi-app:${{ github.sha }}
