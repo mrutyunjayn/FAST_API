@@ -31,28 +31,29 @@ jobs:
           pytest || echo "No tests yet"
 
   docker:
-  runs-on: ubuntu-latest
-  needs: build
+    runs-on: ubuntu-latest
+    needs: build
 
-  steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Log in to DockerHub
-      uses: docker/login-action@v2
-      with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Log in to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-    - name: Build and Push Docker image
-      run: |
-        # Use your repo name instead of "my-image-name"
-        IMAGE_NAME=mrutyunjayn/cicd
+      - name: Build and Push Docker image
+        run: |
+          IMAGE_NAME=mrutyunjayn/cicd
 
-        # Build with 2 tags (latest + commit SHA)
-        docker build -f ./Dockerfile -t $IMAGE_NAME:latest -t $IMAGE_NAME:${{ github.sha }} .
+          # Use short SHA for cleaner tags
+          SHORT_SHA=$(echo "${GITHUB_SHA}" | cut -c1-7)
 
-        # Push both tags
-        docker push $IMAGE_NAME:latest
-        docker push $IMAGE_NAME:${{ github.sha }}
+          # Build image (using ./app as context because Dockerfile expects app/ structure)
+          docker build -f ./Dockerfile -t $IMAGE_NAME:latest -t $IMAGE_NAME:$SHORT_SHA .
 
+          # Push both tags
+          docker push $IMAGE_NAME:latest
+          docker push $IMAGE_NAME:$SHORT_SHA
