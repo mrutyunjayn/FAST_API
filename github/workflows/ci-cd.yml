@@ -47,8 +47,8 @@ jobs:
       - name: Build and Push Docker image
         uses: docker/build-push-action@v4
         with:
-          context: .
-          file: ./Dockerfile
+          context: ./app          # build from the app folder
+          file: ./Dockerfile  # Dockerfile path
           push: true
           tags: |
             mrutyunjayn/cicd:latest
