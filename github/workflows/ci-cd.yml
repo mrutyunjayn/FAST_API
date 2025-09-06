@@ -46,9 +46,14 @@ jobs:
 
       - name: Build and Push Docker image
         run: |
-          # Build with both tags (latest + commit SHA)
-          docker build -f ./Dockerfile -t mrutyunjayn/cicd:latest -t mrutyunjayn/cicd:${{ github.sha }} .
+          IMAGE_NAME=mrutyunjayn/cicd
+
+          # Use short SHA for cleaner tags
+          SHORT_SHA=$(echo "${GITHUB_SHA}" | cut -c1-7)
+
+          # Build image (using ./app as context because Dockerfile expects app/ structure)
+          docker build -f ./Dockerfile -t $IMAGE_NAME:latest -t $IMAGE_NAME:$SHORT_SHA .
 
           # Push both tags
-          docker push mrutyunjayn/cicd:latest
-          docker push mrutyunjayn/cicd:${{ github.sha }}
+          docker push $IMAGE_NAME:latest
+          docker push $IMAGE_NAME:$SHORT_SHA
